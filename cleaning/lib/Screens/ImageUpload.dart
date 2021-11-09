@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 class ImageUpload extends StatefulWidget {
   const ImageUpload({ Key? key }) : super(key: key);
@@ -16,7 +17,10 @@ class ImageUpload extends StatefulWidget {
 class _ImageUploadState extends State<ImageUpload> {
   File ?_imageFile = null;
   final picker = ImagePicker();
-
+  bool isUpload = false;
+  double progress = 0.0;
+  
+  late firebase_storage.UploadTask _uploadTask;
   Future pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
     setState(() {
@@ -34,14 +38,20 @@ class _ImageUploadState extends State<ImageUpload> {
                     .SettableMetadata(
                       contentType: 'image/jpeg',
                       customMetadata: {'picked-file-path':fileName});
-
-    firebase_storage.UploadTask uploadTask;
-    uploadTask = reference.putFile(io.File(_imageFile!.path),metadata);
-    firebase_storage.UploadTask task = await Future.value(uploadTask);
-    Future.value(uploadTask).then((value) => {
+  
+    _uploadTask = reference.putFile(io.File(_imageFile!.path),metadata);
+    firebase_storage.UploadTask task = await Future.value(_uploadTask);
+    Future.value(_uploadTask).then((value) => {
       print("upload file path ${value.ref.fullPath}")
     }).onError((error, stackTrace) => {
       print("upload file path error ${error.toString()}")
+    });
+    task.snapshotEvents.listen((event) {
+      setState(() {
+        progress = ((event.bytesTransferred.toDouble()/
+                      event.totalBytes.toDouble())*100)
+                      .roundToDouble();
+      });
     });
   }
 
@@ -102,7 +112,16 @@ class _ImageUploadState extends State<ImageUpload> {
                     ],
                   ),
                 ),
-                uploadImageButton(context),
+                 !isUpload ?
+                uploadImageButton(context) 
+                 :
+                  CircularPercentIndicator(
+                  radius: 60.0,
+                  lineWidth: 5.0,
+                  percent: progress/100,
+                  center: new Text("$progress %"),
+                  progressColor: Colors.green,
+                )
               ],
             ),
           ),
@@ -125,7 +144,12 @@ class _ImageUploadState extends State<ImageUpload> {
                 ),
                 borderRadius: BorderRadius.circular(30.0)),
             child: TextButton(
-              onPressed: () => uploadImageToDatabase(context),
+              onPressed: (){
+                setState(() {
+                  isUpload = true;
+                });
+                uploadImageToDatabase(context);
+              } ,
               child: Text(
                 "Upload Image",
                 style: TextStyle(fontSize: 20,color: Colors.white),
