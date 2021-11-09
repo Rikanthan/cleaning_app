@@ -1,5 +1,7 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
 
 class ShowImages extends StatefulWidget {
   const ShowImages({ Key? key }) : super(key: key);
@@ -51,7 +53,20 @@ class _ShowImagesState extends State<ShowImages> {
                           margin: EdgeInsets.symmetric(vertical: 10),
                           child: ListTile(
                             dense: false,
-                            leading: Image.network(image['url']),
+                            leading: Image.network(
+                              image['url'], 
+                              fit: BoxFit.fill,
+                              loadingBuilder: (BuildContext context, 
+                              Widget child,
+                              ImageChunkEvent? loadingProgress){
+                                if(loadingProgress == null)
+                                return child;
+                                return SpinKitCubeGrid(
+                                  size: 40,
+                                  color: Colors.blue,
+                                );
+                              },
+                              ),
                              title: Text(image['upload_time']),
                             // subtitle: Text(image['Updated']),
                             trailing: IconButton(
@@ -68,7 +83,9 @@ class _ShowImagesState extends State<ShowImages> {
                   }
 
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child: SpinKitWave(
+                      color: Colors.black,
+                    ),
                   );
                 },
               ),

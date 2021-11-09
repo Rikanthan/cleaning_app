@@ -1,11 +1,17 @@
 import 'dart:io' as io;
 import 'dart:io';
+import 'package:cleaning/Screens/ShowImages.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:intl/intl.dart';
+
+enum UploadStatus{
+  notStarted, inprogress, finished
+}
 
 class ImageUpload extends StatefulWidget {
   const ImageUpload({ Key? key }) : super(key: key);
@@ -16,13 +22,14 @@ class ImageUpload extends StatefulWidget {
 
 class _ImageUploadState extends State<ImageUpload> {
   File ?_imageFile = null;
+  String uploadText = "Uploading...";
   final picker = ImagePicker();
-  bool isUpload = false;
+  UploadStatus _uploadStatus = UploadStatus.notStarted;
   double progress = 0.0;
-  
+  String date = DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime.now());
   late firebase_storage.UploadTask _uploadTask;
   Future pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _imageFile = File(pickedFile!.path);
     });
@@ -37,7 +44,8 @@ class _ImageUploadState extends State<ImageUpload> {
     final metadata = firebase_storage
                     .SettableMetadata(
                       contentType: 'image/jpeg',
-                      customMetadata: {'picked-file-path':fileName});
+                      customMetadata: {'picked-file-path':fileName,
+                                        'upload_time': date});
   
     _uploadTask = reference.putFile(io.File(_imageFile!.path),metadata);
     firebase_storage.UploadTask task = await Future.value(_uploadTask);
@@ -53,6 +61,12 @@ class _ImageUploadState extends State<ImageUpload> {
                       .roundToDouble();
       });
     });
+    task.whenComplete((){
+      uploadText = "Upload success!";
+      _uploadStatus = UploadStatus.finished;
+      Navigator.push(
+        context, MaterialPageRoute(builder: (_)=> ShowImages()));
+    });
   }
 
   @override
@@ -67,7 +81,7 @@ class _ImageUploadState extends State<ImageUpload> {
                     bottomLeft: Radius.circular(250.0),
                     bottomRight: Radius.circular(10.0)),
                 gradient: LinearGradient(
-                    colors: [Colors.orange,Colors.green],
+                    colors: [Colors.black,Colors.blue],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight)),
           ),
@@ -99,7 +113,7 @@ class _ImageUploadState extends State<ImageUpload> {
                           borderRadius: BorderRadius.circular(30.0),
                           child: _imageFile != null
                               ? Image.file(_imageFile!)
-                              : FlatButton(
+                              :TextButton(
                             child: Icon(
                               Icons.add_a_photo,
                               color: Colors.blue,
@@ -112,16 +126,22 @@ class _ImageUploadState extends State<ImageUpload> {
                     ],
                   ),
                 ),
-                 !isUpload ?
-                uploadImageButton(context) 
-                 :
+                if( _uploadStatus == UploadStatus.notStarted)
+                uploadImageButton(context),
+                if(_uploadStatus != UploadStatus.notStarted)
+                Padding(
+                  padding: const EdgeInsets.only(bottom:20.0),
+                  child: Text(uploadText),
+                ),
+                if(_uploadStatus == UploadStatus.inprogress )
                   CircularPercentIndicator(
                   radius: 60.0,
                   lineWidth: 5.0,
                   percent: progress/100,
-                  center: new Text("$progress %"),
+                  center: new Text("$progress%"),
                   progressColor: Colors.green,
                 )
+    
               ],
             ),
           ),
@@ -140,15 +160,16 @@ class _ImageUploadState extends State<ImageUpload> {
                 top: 30, left: 20.0, right: 20.0, bottom: 20.0),
             decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.orange, Colors.green],
+                  colors: [Colors.black, Colors.blue],
                 ),
                 borderRadius: BorderRadius.circular(30.0)),
             child: TextButton(
               onPressed: (){
-                setState(() {
-                  isUpload = true;
-                });
                 uploadImageToDatabase(context);
+                setState(() {
+                  _uploadStatus = UploadStatus.inprogress;
+                });
+                
               } ,
               child: Text(
                 "Upload Image",
