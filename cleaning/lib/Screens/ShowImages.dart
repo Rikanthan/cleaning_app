@@ -28,7 +28,6 @@ class _ShowImagesState extends State<ShowImages> {
         "upload_time":fileMeta.customMetadata?['upload_time'] ?? ""
       });
     });
-
     return files;
   }
   @override
@@ -48,7 +47,6 @@ class _ShowImagesState extends State<ShowImages> {
                       itemBuilder: (context, index) {
                         final Map<String, dynamic> image =
                             snapshot.data![index];
-
                         return Card(
                           margin: EdgeInsets.symmetric(vertical: 10),
                           child: ListTile(
@@ -68,7 +66,6 @@ class _ShowImagesState extends State<ShowImages> {
                               },
                               ),
                              title: Text(image['upload_time']),
-                            // subtitle: Text(image['Updated']),
                             trailing: IconButton(
                               onPressed: () {},
                               icon: Icon(

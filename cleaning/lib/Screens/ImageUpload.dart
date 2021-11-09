@@ -29,9 +29,15 @@ class _ImageUploadState extends State<ImageUpload> {
   String date = DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime.now());
   late firebase_storage.UploadTask _uploadTask;
   Future pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
     setState(() {
-      _imageFile = File(pickedFile!.path);
+      try{
+        _imageFile = File(pickedFile!.path);
+      }
+      catch(e)
+      {
+        print(e);
+      }
     });
   }
 
@@ -64,8 +70,8 @@ class _ImageUploadState extends State<ImageUpload> {
     task.whenComplete((){
       uploadText = "Upload success!";
       _uploadStatus = UploadStatus.finished;
-      Navigator.push(
-        context, MaterialPageRoute(builder: (_)=> ShowImages()));
+      // Navigator.push(
+      //   context, MaterialPageRoute(builder: (_)=> ShowImages()));
     });
   }
 
@@ -83,7 +89,8 @@ class _ImageUploadState extends State<ImageUpload> {
                 gradient: LinearGradient(
                     colors: [Colors.black,Colors.blue],
                     begin: Alignment.topLeft,
-                    end: Alignment.bottomRight)),
+                    end: Alignment.bottomRight)
+                    ),
           ),
           Container(
             margin: const EdgeInsets.only(top: 80),
@@ -113,14 +120,49 @@ class _ImageUploadState extends State<ImageUpload> {
                           borderRadius: BorderRadius.circular(30.0),
                           child: _imageFile != null
                               ? Image.file(_imageFile!)
-                              :TextButton(
-                            child: Icon(
-                              Icons.add_a_photo,
-                              color: Colors.blue,
-                              size: 50,
-                            ),
-                            onPressed: pickImage,
-                          ),
+                              :Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  TextButton(
+                                      child: Icon(
+                                            Icons.add_a_photo,
+                                            color: Colors.blue,
+                                            size: 50,
+                                      ),
+                                      onPressed: () async{                         
+                                          final pickedFile = await picker.pickImage(source: ImageSource.camera);
+                                          setState(() {
+                                            try{
+                                              _imageFile = File(pickedFile!.path);
+                                            }
+                                            catch(e)
+                                            {
+                                              print(e);
+                                            }
+                                          });
+                                      },
+                                    ),
+                                  TextButton(
+                                      child: Icon(
+                                            Icons.add_photo_alternate,
+                                            color: Colors.blue,
+                                            size: 50,
+                                      ),
+                                      onPressed: () async{                         
+                                          final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                          setState(() {
+                                            try{
+                                              _imageFile = File(pickedFile!.path);
+                                            }
+                                            catch(e)
+                                            {
+                                              print(e);
+                                            }
+                                          });
+                                      },
+                                    ),
+                                ],
+                              ),
                         ),
                       ),
                     ],
@@ -139,9 +181,11 @@ class _ImageUploadState extends State<ImageUpload> {
                   lineWidth: 5.0,
                   percent: progress/100,
                   center: new Text("$progress%"),
-                  progressColor: Colors.green,
+                  linearGradient: LinearGradient(
+                    colors: [Colors.black,Colors.blue],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight)
                 )
-    
               ],
             ),
           ),
@@ -168,8 +212,7 @@ class _ImageUploadState extends State<ImageUpload> {
                 uploadImageToDatabase(context);
                 setState(() {
                   _uploadStatus = UploadStatus.inprogress;
-                });
-                
+                });   
               } ,
               child: Text(
                 "Upload Image",
