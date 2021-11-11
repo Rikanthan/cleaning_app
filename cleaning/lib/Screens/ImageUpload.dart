@@ -70,8 +70,8 @@ class _ImageUploadState extends State<ImageUpload> {
     task.whenComplete((){
       uploadText = "Upload success!";
       _uploadStatus = UploadStatus.finished;
-      // Navigator.push(
-      //   context, MaterialPageRoute(builder: (_)=> ShowImages()));
+      Navigator.push(
+        context, MaterialPageRoute(builder: (_)=> ShowImages()));
     });
   }
 

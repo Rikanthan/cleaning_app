@@ -12,13 +12,13 @@ class ShowImages extends StatefulWidget {
 
 class _ShowImagesState extends State<ShowImages> {
   FirebaseStorage storage = FirebaseStorage.instance;
-
+  bool isOnTap = false;
+  String url = "";
+  String uploadTime = "";
   Future<List<Map<String, dynamic>>> _loadImages() async {
     List<Map<String, dynamic>> files = [];
-
     final ListResult result = await storage.ref().child("uploads").list();
     final List<Reference> allFiles = result.items;
-
     await Future.forEach<Reference>(allFiles, (file) async {
       final String fileUrl = await file.getDownloadURL();
       final FullMetadata fileMeta = await file.getMetadata();
@@ -35,6 +35,7 @@ class _ShowImagesState extends State<ShowImages> {
     return Scaffold(
       body: Column(
         children: [
+            if(!isOnTap)
              Expanded(
               child: FutureBuilder(
                 future: _loadImages(),
@@ -64,7 +65,7 @@ class _ShowImagesState extends State<ShowImages> {
                                   color: Colors.blue,
                                 );
                               },
-                              ),
+                            ),
                              title: Text(image['upload_time']),
                             trailing: IconButton(
                               onPressed: () {},
@@ -73,12 +74,18 @@ class _ShowImagesState extends State<ShowImages> {
                                 color: Colors.red,
                               ),
                             ),
+                            onTap: (){
+                              setState(() {
+                                url = image['url'];
+                                uploadTime = image['upload_time'];
+                                isOnTap = true;
+                              });
+                            },
                           ),
                         );
                       },
                     );
                   }
-
                   return Center(
                     child: SpinKitWave(
                       color: Colors.black,
@@ -86,6 +93,46 @@ class _ShowImagesState extends State<ShowImages> {
                   );
                 },
               ),
+            ),
+            if(isOnTap)
+            Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.network(
+                    url, 
+                    fit: BoxFit.fill,
+                    loadingBuilder: (BuildContext context, 
+                    Widget child,
+                    ImageChunkEvent? loadingProgress){
+                      if(loadingProgress == null)
+                      return child;
+                      return SpinKitCubeGrid(
+                        size: 40,
+                        color: Colors.blue,
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top:80.0),
+                  child: Text(uploadTime),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top:200.0),
+                  child: Center(
+                    child: TextButton(
+                      child: Icon(Icons.ac_unit),
+                      onPressed: (){
+                        setState(() {
+                          isOnTap = false;
+                          }
+                        );
+                      },
+                    ),
+                  ),
+                )
+              ],
             ),
         ],
       ),

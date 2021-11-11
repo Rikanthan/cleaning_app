@@ -1,4 +1,5 @@
 import 'package:cleaning/Screens/ImageUpload.dart';
+import 'package:cleaning/Screens/Login.dart';
 import 'package:cleaning/Screens/ShowImages.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ImageUpload()
+      home: Login()
     );
   }
 }
