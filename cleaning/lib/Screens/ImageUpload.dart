@@ -100,11 +100,12 @@ class _ImageUploadState extends State<ImageUpload> {
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(
-                      "Uploading Image to Firebase Storage",
+                      "Upload Image",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 28,
-                          fontStyle: FontStyle.italic),
+                          fontFamily: 'Lato'
+                          ),
                     ),
                   ),
                 ),
@@ -213,6 +214,13 @@ class _ImageUploadState extends State<ImageUpload> {
                 setState(() {
                   _uploadStatus = UploadStatus.inprogress;
                 });   
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(
+                    builder: (_)=> 
+                      ShowImages()
+                      )
+                    );
               } ,
               child: Text(
                 "Upload Image",

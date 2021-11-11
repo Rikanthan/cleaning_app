@@ -1,17 +1,16 @@
-import 'package:cleaning/Screens/ImageUpload.dart';
-import 'package:cleaning/Screens/Register.dart';
+import 'package:cleaning/Screens/Login.dart';
 import 'package:cleaning/Widgets/button.dart';
 import 'package:cleaning/Widgets/text_input.dart';
 import 'package:flutter/material.dart';
 
-class Login extends StatefulWidget {
-  const Login({ Key? key }) : super(key: key);
+class Register extends StatefulWidget {
+  const Register({ Key? key }) : super(key: key);
 
   @override
-  _LoginState createState() => _LoginState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _LoginState extends State<Login> {
+class _RegisterState extends State<Register> {
     final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   @override
@@ -23,8 +22,9 @@ class _LoginState extends State<Login> {
         child: Stack(
           children: [
             Positioned(
+              left: width/10,
               child: Container(
-                height: 260,
+                height: 150,
                 width: width,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
@@ -36,24 +36,48 @@ class _LoginState extends State<Login> {
                         end: Alignment.bottomRight
                           )
                         ),
-                        child: Center(
-                          child: Text(
-                            'Login',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontFamily: 'Lato',
-                              fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                        ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top:260.0),
+              padding: const EdgeInsets.only(top:50.0),
+              child: Center(
+                child: Text(
+                  'Register',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontFamily: 'Lato',
+                    fontWeight: FontWeight.w500,
+                    ),
+                  ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top:130.0),
               child: Center(
                 child: Column(
                   children: [
+                    TextInput(
+                      controller: _usernameController,
+                      hideText: false, 
+                      hintText: 'Name', 
+                      iconData: Icons.person,
+                      inputAction: TextInputAction.next,
+                      ),
+                      TextInput(
+                      controller: _usernameController,
+                      hideText: false, 
+                      hintText: 'Phone', 
+                      iconData: Icons.phone_android,
+                      inputAction: TextInputAction.next,
+                      ),
+                      TextInput(
+                      controller: _usernameController,
+                      hideText: false, 
+                      hintText: 'Address', 
+                      iconData: Icons.location_city,
+                      inputAction: TextInputAction.next,
+                      ),
                     TextInput(
                       controller: _usernameController,
                       hideText: false, 
@@ -69,52 +93,33 @@ class _LoginState extends State<Login> {
                       inputAction: TextInputAction.go,
                       ),
                       CustomButton(
-                        buttonText: "Log in", 
+                        buttonText: "Register", 
                         onPress: (){
-                            Navigator.push(
-                              context, 
-                              MaterialPageRoute(
-                                builder: (_) => ImageUpload()
-                                )
+                          Navigator.push(
+                            context,
+                             MaterialPageRoute(
+                               builder: (_)=> Login()
+                               )
                               );
-                          }
-                        ),
-                      TextButton(
-                        onPressed: (){}, 
-                        child: Text('Forgot your password?')
-                        ),
-                        InkWell(
-                          onTap: (){
-                            Navigator.push(
-                              context, 
-                              MaterialPageRoute(
-                                builder: (_) => Register()
-                                )
-                              );
-                          },
-                          child: Text(
-                            "Don't have an account? Register now!"
-                          ),
-                        )
+                        }
+                      ),
                   ],
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: height - 100, right: width/1.5),
+              padding: EdgeInsets.only(top: height - 70, right: width/1.25),
               child: Container(
-                height: 100,
+                height: 70,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(10.0),
-                        topRight: Radius.circular(200.0)),
+                        topRight: Radius.circular(250.0)),
                     gradient: LinearGradient(
                         colors: [Colors.black,Colors.blue],
                         begin: Alignment.topLeft,
-                        end: Alignment.bottomRight
-                          ),
+                        end: Alignment.bottomRight)
                         ),
-                        clipBehavior: Clip.antiAlias,
               ),
             ),
           ],
