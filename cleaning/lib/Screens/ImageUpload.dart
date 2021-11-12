@@ -1,10 +1,10 @@
+import 'dart:convert';
 import 'dart:io' as io;
 import 'dart:io';
-import 'package:cleaning/Screens/ShowImages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:mongo_dart/mongo_dart.dart'show Db, GridFS;
 import 'package:path/path.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:intl/intl.dart';
@@ -21,13 +21,27 @@ class ImageUpload extends StatefulWidget {
 }
 
 class _ImageUploadState extends State<ImageUpload> {
+  final url = [
+      "mongodb://admin:admin123@cluster0-shard-00-00.zn07v.mongodb.net:27017/cleaning_db?ssl=true&replicaSet=<MySet>&authSource=admin&retryWrites=true&w=majority",
+      "mongodb://admin:admin123@cluster0-shard-00-01.zn07v.mongodb.net:27017/cleaning_db?ssl=true&replicaSet=<MySet>&authSource=admin&retryWrites=true&w=majority",
+      "mongodb://admin:admin123@cluster0-shard-00-02.zn07v.mongodb.net:27017/cleaning_db?ssl=true&replicaSet=<MySet>&authSource=admin&retryWrites=true&w=majority"
+  ];
   File ?_imageFile = null;
+  late MemoryImage _image;
+  GridFS? bucket;
+  var flag = false;
   String uploadText = "Uploading...";
   final picker = ImagePicker();
   UploadStatus _uploadStatus = UploadStatus.notStarted;
   double progress = 0.0;
   String date = DateFormat('dd-MM-yyyy hh:mm:ss a').format(DateTime.now());
-  late firebase_storage.UploadTask _uploadTask;
+
+    @override
+  void initState() {
+    super.initState();
+    connection();
+  }
+
   Future pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
     setState(() {
@@ -40,39 +54,69 @@ class _ImageUploadState extends State<ImageUpload> {
       }
     });
   }
+   Future connection () async{
+    try{
+      Db _db = new Db.pool(url);
+    await _db.open(secure: true);
+    print(_db.databaseName);
+    bucket = GridFS(_db,"image");
+    }
+    catch(e)
+    {
+      print(e);
+    }
+  }
 
   Future uploadImageToDatabase(BuildContext context) async {
-    String fileName = basename(_imageFile!.path);
-    firebase_storage.Reference reference = 
-          firebase_storage.FirebaseStorage.instance
-          .ref().child('uploads').child('/$fileName');
-
-    final metadata = firebase_storage
-                    .SettableMetadata(
-                      contentType: 'image/jpeg',
-                      customMetadata: {'picked-file-path':fileName,
-                                        'upload_time': date});
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if(pickedFile!=null){
+      var _cmpressed_image;
+      try {
+        _cmpressed_image = await FlutterImageCompress.compressWithFile(
+            pickedFile.path,
+            format: CompressFormat.heic,
+            quality: 70
+        );
+      } catch (e) {
   
-    _uploadTask = reference.putFile(io.File(_imageFile!.path),metadata);
-    firebase_storage.UploadTask task = await Future.value(_uploadTask);
-    Future.value(_uploadTask).then((value) => {
-      print("upload file path ${value.ref.fullPath}")
-    }).onError((error, stackTrace) => {
-      print("upload file path error ${error.toString()}")
-    });
-    task.snapshotEvents.listen((event) {
+        _cmpressed_image = await FlutterImageCompress.compressWithFile(
+            pickedFile.path,
+            format: CompressFormat.jpeg,
+            quality: 70
+        );
+      }
       setState(() {
-        progress = ((event.bytesTransferred.toDouble()/
-                      event.totalBytes.toDouble())*100)
-                      .roundToDouble();
+        flag = true;
+         _imageFile = File(pickedFile.path);
       });
-    });
-    task.whenComplete((){
-      uploadText = "Upload success!";
-      _uploadStatus = UploadStatus.finished;
-      Navigator.push(
-        context, MaterialPageRoute(builder: (_)=> ShowImages()));
-    });
+  
+      Map<String,dynamic> image = {
+        "_id" : pickedFile.path.split("/").last,
+        "data": base64Encode(_cmpressed_image)
+      };
+      try{
+        var res = await bucket!.chunks.insert(image);
+      }
+      catch(e)
+      {
+        print(e);
+      }
+      try
+      {
+            var img = await bucket!.chunks.findOne({
+            "_id": pickedFile.path.split("/").last
+          });
+            setState(() {
+            _image = MemoryImage(base64Decode(img!["data"]));
+            flag = false;
+          });
+      }
+      catch(e)
+      {
+        print(e);
+      }
+      
+    }
   }
 
   @override
@@ -169,24 +213,24 @@ class _ImageUploadState extends State<ImageUpload> {
                     ],
                   ),
                 ),
-                if( _uploadStatus == UploadStatus.notStarted)
+               // if( _uploadStatus == UploadStatus.notStarted)
                 uploadImageButton(context),
-                if(_uploadStatus != UploadStatus.notStarted)
-                Padding(
-                  padding: const EdgeInsets.only(bottom:20.0),
-                  child: Text(uploadText),
-                ),
-                if(_uploadStatus == UploadStatus.inprogress )
-                  CircularPercentIndicator(
-                  radius: 60.0,
-                  lineWidth: 5.0,
-                  percent: progress/100,
-                  center: new Text("$progress%"),
-                  linearGradient: LinearGradient(
-                    colors: [Colors.black,Colors.blue],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight)
-                )
+                // if(_uploadStatus != UploadStatus.notStarted)
+                // Padding(
+                //   padding: const EdgeInsets.only(bottom:20.0),
+                //   child: Text(uploadText),
+                // ),
+                // if(_uploadStatus == UploadStatus.inprogress )
+                //   CircularPercentIndicator(
+                //   radius: 60.0,
+                //   lineWidth: 5.0,
+                //   percent: progress/100,
+                //   center: new Text("$progress%"),
+                //   linearGradient: LinearGradient(
+                //     colors: [Colors.black,Colors.blue],
+                //     begin: Alignment.topLeft,
+                //     end: Alignment.bottomRight)
+                // )
               ],
             ),
           ),
@@ -214,13 +258,13 @@ class _ImageUploadState extends State<ImageUpload> {
                 setState(() {
                   _uploadStatus = UploadStatus.inprogress;
                 });   
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(
-                    builder: (_)=> 
-                      ShowImages()
-                      )
-                    );
+                // Navigator.push(
+                //   context, 
+                //   MaterialPageRoute(
+                //     builder: (_)=> 
+                //       ShowImages()
+                //       )
+                //     );
               } ,
               child: Text(
                 "Upload Image",
@@ -232,4 +276,7 @@ class _ImageUploadState extends State<ImageUpload> {
       ),
     );
   }
+
+
+  
 }
