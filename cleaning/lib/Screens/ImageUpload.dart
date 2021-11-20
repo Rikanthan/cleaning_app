@@ -28,7 +28,7 @@ class _ImageUploadState extends State<ImageUpload> {
   ];
   File ?_imageFile = null;
   late MemoryImage _image;
-  GridFS? bucket;
+  GridFS ? bucket;
   var flag = false;
   String uploadText = "Uploading...";
   final picker = ImagePicker();
@@ -59,6 +59,7 @@ class _ImageUploadState extends State<ImageUpload> {
       Db _db = new Db.pool(url);
     await _db.open(secure: true);
     print(_db.databaseName);
+    
     bucket = GridFS(_db,"image");
     }
     catch(e)
@@ -95,6 +96,7 @@ class _ImageUploadState extends State<ImageUpload> {
         "data": base64Encode(_cmpressed_image)
       };
       try{
+        connection();
         var res = await bucket!.chunks.insert(image);
       }
       catch(e)
@@ -103,7 +105,10 @@ class _ImageUploadState extends State<ImageUpload> {
       }
       try
       {
-            var img = await bucket!.chunks.findOne({
+         Db _db = new Db.pool(url);
+    await _db.open(secure: true);
+        GridFS bucket = GridFS(_db,"image");
+            var img = await bucket.chunks.findOne({
             "_id": pickedFile.path.split("/").last
           });
             setState(() {
