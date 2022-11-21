@@ -84,7 +84,7 @@ class _TextInputState extends State<TextInput> {
                       ),
                     ),
                   ),
-                   style: TextStyle(color: Colors.white),
+                   style: TextStyle(color: Colors.black),
                 ),
       ),
     );

@@ -127,10 +127,8 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               if(flag==true)
                 CircularProgressIndicator(valueColor: _colorTween),
               SizedBox(height: 20,),
-              RaisedButton(
+              TextButton(
                 onPressed: getImage,
-                textColor: Colors.white,
-                padding: const EdgeInsets.all(0.0),
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(

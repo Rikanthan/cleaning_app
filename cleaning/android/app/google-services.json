@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "561974032703",
-    "project_id": "cleaning-1fb69",
-    "storage_bucket": "cleaning-1fb69.appspot.com"
+    "project_number": "27202622763",
+    "project_id": "cleaning-ac4ad",
+    "storage_bucket": "cleaning-ac4ad.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:561974032703:android:afda57897513dd36b67b8a",
+        "mobilesdk_app_id": "1:27202622763:android:55bf208911212929c5a16e",
         "android_client_info": {
           "package_name": "com.example.cleaning"
         }
       },
       "oauth_client": [
         {
-          "client_id": "561974032703-998ahldk1j78ip6hbr5hpl4qp2ada437.apps.googleusercontent.com",
+          "client_id": "27202622763-fbqjl59h0gs1ut6rpgn7g4d0oghqhhd4.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCsRTw1h4Qe0-RsjKrJ1f3WvqskOkjquD4"
+          "current_key": "AIzaSyDQZ5T2Xc3ch-t-pub55arOEVgBET27uEI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "561974032703-998ahldk1j78ip6hbr5hpl4qp2ada437.apps.googleusercontent.com",
+              "client_id": "27202622763-fbqjl59h0gs1ut6rpgn7g4d0oghqhhd4.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
