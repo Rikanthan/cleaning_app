@@ -1,8 +1,13 @@
+import 'dart:math';
+
 import 'package:cleaning/Screens/ImageUpload.dart';
 import 'package:cleaning/Screens/Register.dart';
+import 'package:cleaning/Services/UserService.dart';
 import 'package:cleaning/Widgets/button.dart';
 import 'package:cleaning/Widgets/text_input.dart';
 import 'package:flutter/material.dart';
+
+import '../Widgets/RandomCircle.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -12,7 +17,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -24,11 +29,11 @@ class _LoginState extends State<Login> {
           children: [
             Positioned(
               child: Container(
-                height: 260,
+                height: height/3,
                 width: width,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(250.0),
+                        bottomLeft: Radius.circular(height/2),
                         bottomRight: Radius.circular(10.0)),
                     gradient: LinearGradient(
                         colors: [Colors.black, Colors.blue],
@@ -47,13 +52,15 @@ class _LoginState extends State<Login> {
                 ),
               ),
             ),
+            for (int i = 1; i < 20 + Random().nextInt(10) + 1; i++)
+              RandomCircle(),
             Padding(
               padding: EdgeInsets.only(top: 260.0),
               child: Center(
                 child: Column(
                   children: [
                     TextInput(
-                      controller: _usernameController,
+                      controller: _emailController,
                       hideText: false,
                       hintText: 'Email',
                       iconData: Icons.email_sharp,
@@ -68,9 +75,8 @@ class _LoginState extends State<Login> {
                     ),
                     CustomButton(
                         buttonText: "Log in",
-                        onPress: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => ImageUpload()));
+                        onPress: () async{
+                          UserService().login(_emailController.text, _passwordController.text);
                         }),
                     TextButton(
                         onPressed: () {}, child: Text('Forgot your password?')),

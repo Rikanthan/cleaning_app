@@ -8,18 +8,18 @@ class RandomCircle extends StatelessWidget {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return Positioned(
-        top: height / 5 + height * Random().nextDouble(),
+        top: height / 3 + height * Random().nextDouble(),
         left: height * Random().nextDouble(),
         child: Container(
-          height: number.toDouble(),
-          width: number.toDouble(),
-          decoration: BoxDecoration(
+            height: number.toDouble(),
+            width: number.toDouble(),
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.all(
                 Radius.circular(number.toDouble()),
               ),
               color: number % 2 == 0
-                  ? Colors.black
-                  : Color.fromARGB(255, 3, 26, 44)),
-        ));
+                  ? Color.fromARGB(255, 54, 54, 54).withOpacity(0.1)
+                  : Color.fromARGB(255, 167, 207, 238).withOpacity(0.1),
+            )));
   }
 }

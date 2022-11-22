@@ -31,11 +31,11 @@ class _RegisterState extends State<Register> {
             Positioned(
               left: width / 10,
               child: Container(
-                height: 150,
+                height: height / 3,
                 width: width,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(250.0),
+                        bottomLeft: Radius.circular(height / 2),
                         bottomRight: Radius.circular(10.0)),
                     gradient: LinearGradient(
                         colors: [Colors.black, Colors.blue],
@@ -44,27 +44,25 @@ class _RegisterState extends State<Register> {
               ),
             ),
             Positioned(
-              top: height / 10,
-              left: width / 3,
-              child: Center(
-                child: Text(
-                  'Register',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
-                    fontFamily: 'Lato',
-                    fontWeight: FontWeight.w500,
-                  ),
+              top: height / 7,
+              left: width / 2.75,
+              child: Text(
+                'Register',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 30,
+                  fontFamily: 'Lato',
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
-            for(int i = 1; i < 20 + Random().nextInt(10) + 1; i++)
-            RandomCircle(),
+            for (int i = 1; i < 20 + Random().nextInt(10) + 1; i++)
+              RandomCircle(),
             SingleChildScrollView(
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: 130.0),
+                    padding: EdgeInsets.only(top: 230.0),
                     child: Center(
                       child: Column(
                         children: [
@@ -105,12 +103,12 @@ class _RegisterState extends State<Register> {
                           ),
                           CustomButton(
                               buttonText: "Register",
-                              onPress: () async{
-                                UserService()
-                                .register(_usernameController.text, 
-                                    _phoneNumberController.text, 
-                                    _addressController.text, 
-                                    _emailController.text, 
+                              onPress: () async {
+                                UserService().register(
+                                    _usernameController.text,
+                                    _phoneNumberController.text,
+                                    _addressController.text,
+                                    _emailController.text,
                                     _passwordController.text);
                               }),
                         ],
@@ -121,14 +119,14 @@ class _RegisterState extends State<Register> {
               ),
             ),
             Padding(
-              padding:
-                  EdgeInsets.only(top: height - height / 6, right: width / 1.75),
+              padding: EdgeInsets.only(
+                  top: height - height / 6, right: width / 1.68),
               child: Container(
-                height: 150,
+                height: height / 5,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(10.0),
-                        topRight: Radius.circular(250.0)),
+                        topRight: Radius.circular(height / 2)),
                     gradient: LinearGradient(
                         colors: [Colors.black, Colors.blue],
                         begin: Alignment.topLeft,
